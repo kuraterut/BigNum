@@ -82,7 +82,7 @@ BigNum::BigNum(const std::string strcon){
 		}
 
 		if(len_fract%9 != 0){
-			help.fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
+			fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
 			len_fract-=len_fract%9;
 		}
 		
