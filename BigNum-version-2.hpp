@@ -1,6 +1,7 @@
 #ifndef HEADER_GUARD_VECTOR_HPP_INCLUDED
 #define HEADER_GUARD_VECTOR_HPP_INCLUDED
 
+#include <iostream>
 #include <cassert>
 #include <string>
 #include <cmath>
@@ -10,45 +11,48 @@
 
 #define base 1000*1000*1000
 
-namespace BigNumSpace{
-	struct BigNum
-	{
-		static const long long BASE = base;
 
-		bool is_negative;
+struct BigNum
+{
+	BigNum() = default;
+	BigNum(const char* str);
+	BigNum(const std::string strcon);
 
-		std::vector<long long> integer;
-		std::vector<long long> fractional;
-
-	};
+	static const long long BASE = base;
+	
+	bool is_negative;
+	
+	std::vector<long long> integer;
+	std::vector<long long> fractional;
 	
 	// Создание числа
-	BigNum bignum_create(std::string str);
+	BigNum bignum_create(const char* strch);
+
 
     // Унарный минус
-	BigNum& operator-(BigNum& that);
+	// BigNum operator-(const BigNum& other);
 	
 	// Арифметика
-	BigNum operator+(const BigNum& that, const BigNum& other);
-	BigNum operator-(const BigNum& that, const BigNum& other);
-	BigNum operator*(const BigNum& that, const BigNum& other);
-	BigNum operator/(const BigNum& that, const BigNum& other);
+	BigNum operator+(const BigNum& other);
+	BigNum operator-(const BigNum& other);
+	BigNum operator*(const BigNum& other);
+	BigNum operator/(const BigNum& other);
 
 	// Присваивание
-	BigNum& operator=(BigNum& that, const BigNum& other);
-	BigNum& operator=(BigNum& that, const std::string str);
-	BigNum& operator+=(BigNum& that, const BigNum& other);
-	BigNum& operator-=(BigNum& that, const BigNum& other);
-	BigNum& operator*=(BigNum& that, const BigNum& other);
-	BigNum& operator/=(BigNum& that, const BigNum& other);
+	BigNum& operator=(const BigNum& other);
+	BigNum& operator=(const char* str);
+	BigNum& operator+=(const BigNum& other);
+	BigNum& operator-=(const BigNum& other);
+	BigNum& operator*=(const BigNum& other);
+	BigNum& operator/=(const BigNum& other);
 
 	// Сравнение
-	bool operator==(const BigNum& that, const BigNum& other);
-	bool operator!=(const BigNum& that, const BigNum& other);
-	bool operator>(const BigNum& that, const BigNum& other);
-	bool operator<(const BigNum& that, const BigNum& other);
-	bool operator<=(const BigNum& that, const BigNum& other);
-	bool operator>=(const BigNum& that, const BigNum& other);
+	bool operator==(const BigNum& other);
+	bool operator!=(const BigNum& other);
+	bool operator>(const BigNum& other);
+	bool operator<(const BigNum& other);
+	bool operator<=(const BigNum& other);
+	bool operator>=(const BigNum& other);
     
     // Вывод числа
 	// std::string operator<<(const BigNum& that);
@@ -57,7 +61,11 @@ namespace BigNumSpace{
 
 	// Число pi 
 
-}
+
+};
+
+	
+	
 
 #endif
 

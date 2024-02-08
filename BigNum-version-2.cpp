@@ -1,17 +1,57 @@
-#include <BigNum-version-2.hpp>
+#include "BigNum-version-2.hpp"
 
 
-using namespace BigNumSpace;
 
-BigNum bignum_create(std::string str){
-	BigNum to_return;
 
+BigNum BigNum::bignum_create(const char* strch){
+	// std::cout << "lol" << std::endl;
+	BigNum help;
+	std::string str = strch;
 	if(str[0] == '-'){
-		to_return.is_negative = true;
+		help.is_negative = true;
 		str = str.substr(1);
 	}
 	else{
-		to_return.is_negative = false;
+		help.is_negative = false;
+	}
+
+	long long found_point = str.find(".");
+	long long len = str.length();
+
+	if (found_point == std::string::npos){
+		for (long long i = len; i>0; i-=9){
+			if (i < 9){help.integer.push_back(std::stoll(str.substr(0, i)));}
+			else{help.integer.push_back(std::stoll(str.substr(i-9, 9)));}
+		}
+	}
+	else{
+		
+		std::string str_integer = str.substr(0, found_point);
+		std::string str_fractional = str.substr(found_point+1);
+		long long len_int = str_integer.length();
+		long long len_fract = str_fractional.length();
+
+		for (long long i = len_int; i>=0; i-=9){
+			if (i < 9){help.integer.push_back(std::stoll(str_integer.substr(0, i)));}
+			else{help.integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
+		}
+
+		for (long long i = len_fract; i>=0; i-=9){
+			if (i < 9){help.fractional.push_back(std::stoll(str_fractional.substr(0, i)));}
+			else{help.fractional.push_back(std::stoll(str_fractional.substr(i-9, 9)));}
+		}		
+	}
+	return help;
+}
+
+BigNum::BigNum(const std::string strcon){
+	std::string str = strcon;
+	if(str[0] == '-'){
+		is_negative = true;
+		str = str.substr(1);
+	}
+	else{
+		is_negative = false;
 	}
 
 	long long found_point = str.find(".");
@@ -19,27 +59,32 @@ BigNum bignum_create(std::string str){
 
 	if (found_point == std::string::npos){
 		
-		for (long long i = len-1; i>=0; i-=9){
-			if (i < 9){to_return.integer.push_back(std::stoll(str.substr(0, i)));}
-			else{to_return.integer.push_back(std::stoll(str.substr(i-9, 9)));}
+		for (long long i = len; i>=0; i-=9){
+			if (i < 9){integer.push_back(std::stoll(str.substr(0, i)));}
+			else{integer.push_back(std::stoll(str.substr(i-9, 9)));}
 		}
 	}
 	else{
 		
 		std::string str_integer = str.substr(0, found_point);
 		std::string str_fractional = str.substr(found_point+1);
+		long long len_int = str_integer.length();
+		long long len_fract = str_fractional.length();
 
-		for (long long i = to_return.SIZE_INT-1; i>=0; i-=9){
-			if (i < 9){to_return.integer.push_back(std::stoll(str_integer.substr(0, i)));}
-			else{to_return.integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
+		for (long long i = len_int; i>=0; i-=9){
+			if (i < 9){integer.push_back(std::stoll(str_integer.substr(0, i)));}
+			else{integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
 		}
 
-		for (long long i = to_return.SIZE_FRACT-1; i>=0; i-=9){
-			if (i < 9){to_return.fractional.push_back(std::stoll(str_fractional.substr(0, i)));}
-			else{to_return.fractional.push_back(std::stoll(str_fractional.substr(i-9, 9)));}
+		for (long long i = len_fract; i>=0; i-=9){
+			if (i < 9){fractional.push_back(std::stoll(str_fractional.substr(0, i)));}
+			else{fractional.push_back(std::stoll(str_fractional.substr(i-9, 9)));}
 		}		
 	}
 }
+
+BigNum::BigNum(const char* str) : BigNum(std::string(str))
+{}
 
 // Вспомогательные функции
 BigNum& delete_zeros(BigNum& that){
@@ -80,7 +125,7 @@ bool operator<(const std::vector<long long>& that, const std::vector<long long>&
 			if(that[i] < other[i]){return true;}
 			else if(that[i] > other[i]){return false;}
 		}
-		else{return false;}
+		return false;
 	}
 }
 
@@ -107,8 +152,8 @@ bool is_vec_zero(std::vector<long long>& that){
 
 
 // Унарный минус
-BigNum& operator-(const BigNum& that){
-	BigNum help = that;
+BigNum operator-(const BigNum& other){
+	BigNum help = other;
 	help.is_negative = !help.is_negative;
 	return help;
 }
@@ -117,19 +162,19 @@ BigNum& operator-(const BigNum& that){
 
 
 // Операторы сравнения
-bool operator==(const BigNum& that, const BigNum& other){
-	if (that.integer.size() == other.integer.size() && that.fractional.size() == other.fractional.size() && that.is_negative == other.is_negative){
+bool BigNum::operator==(const BigNum& other){
+	if ((*this).integer.size() == other.integer.size() && (*this).fractional.size() == other.fractional.size() && (*this).is_negative == other.is_negative){
 		
-		long long size_int = that.integer.size();
+		long long size_int = (*this).integer.size();
 		
 		for (long long i = 0; i < size_int; i++){
-			if(that.integer[i] != other.integer[i]){return false;}
+			if((*this).integer[i] != other.integer[i]){return false;}
 		}
 
-		long long size_fract = that.fractional.size();
+		long long size_fract = (*this).fractional.size();
 		
 		for (long long i = 0; i < size_fract; i++){
-			if (that.fractional[i] != other.fractional[i]){return false;}
+			if ((*this).fractional[i] != other.fractional[i]){return false;}
 		}
 
 		return true;
@@ -139,181 +184,182 @@ bool operator==(const BigNum& that, const BigNum& other){
 	return false;
 }
 
-bool operator!=(const BigNum& that, const BigNum& other){
+bool BigNum::operator!=(const BigNum& other){
 	
-	if (that == other){return false;}
+	if ((*this) == other){return false;}
 	else{return true;}
 
 }
 
-bool operator<(const BigNum& that, const BigNum& other){
-	if(that.is_negative != other.is_negative){	
-		if (that.is_negative == true){return true;}
+bool BigNum::operator<(const BigNum& other){
+	BigNum cpy_other = other;
+
+	if((*this).is_negative != other.is_negative){	
+		if ((*this).is_negative == true){return true;}
 		else{return false;}
 	}
 	
-	else if(that.integer.size() < other.integer.size() && that.is_negative == true || that.integer.size() > other.integer.size() && that.is_negative == false){return false;}
-	else if(that.integer.size() < other.integer.size() && that.is_negative == false || that.integer.size() > other.integer.size() && that.is_negative == true){return true;}
+	else if((*this).integer.size() < other.integer.size() && (*this).is_negative == true || (*this).integer.size() > other.integer.size() && (*this).is_negative == false){return false;}
+	else if((*this).integer.size() < other.integer.size() && (*this).is_negative == false || (*this).integer.size() > other.integer.size() && (*this).is_negative == true){return true;}
 
 	else{
-		long long size_int = that.integer.size();
-		if (that.fractional.size() > other.fractional.size()){
-			other.fractional.resize(that.fractional.size(), 0);
+		long long size_int = (*this).integer.size();
+		if ((*this).fractional.size() > other.fractional.size()){
+			cpy_other.fractional.resize(fractional.size(), 0);
 		}
 		else{
-			that.fractional.resize(other.fractional.size(), 0);	
+			(*this).fractional.resize(other.fractional.size(), 0);	
 		}
-		long long size_fract = that.fractional.size();
+		long long size_fract = (*this).fractional.size();
 
-		if (that.is_negative == true){
+		if ((*this).is_negative == true){
 			for (long long i = size_int-1; i >= 0; i--){
-				if(that.integer[i] > other.integer[i]){return true;}
-				else if(that.integer[i] < other.integer[i]){return false;}
+				if((*this).integer[i] > cpy_other.integer[i]){return true;}
+				else if((*this).integer[i] < cpy_other.integer[i]){return false;}
 			}
 		
 			for (long long i = size_fract-1; i >= 0; i--){
-				if (that.fractional[i] > other.fractional[i]){return true;}
-				else if(that.fractional[i] < other.fractional[i]){return false;}	
+				if ((*this).fractional[i] > cpy_other.fractional[i]){return true;}
+				else if((*this).fractional[i] < cpy_other.fractional[i]){return false;}	
 			}
 			return false;
 		}
 
 		else{
 			for (long long i = size_int-1; i >= 0; i--){
-				if(that.integer[i] > other.integer[i]){return false;}
-				else if(that.integer[i] < other.integer[i]){return true;}
+				if((*this).integer[i] > cpy_other.integer[i]){return false;}
+				else if((*this).integer[i] < cpy_other.integer[i]){return true;}
 			}
 		
 			for (long long i = size_fract-1; i >= 0; i--){
-				if (that.fractional[i] > other.fractional[i]){return false;}
-				else if(that.fractional[i] < other.fractional[i]){return true;}	
+				if ((*this).fractional[i] > cpy_other.fractional[i]){return false;}
+				else if((*this).fractional[i] < cpy_other.fractional[i]){return true;}	
 			}
 			return false;
 		}
 	}
 }
 
-bool operator<=(const BigNum& that, const BigNum& other){
-	if (that == other || that < other){return true;}
+bool BigNum::operator<=(const BigNum& other){
+	if ((*this) == other || (*this) < other){return true;}
 	else{return false;}
 }
 
-bool operator>(const BigNum& that, const BigNum& other){
-	if(that <= other) {return false;}
+bool BigNum::operator>(const BigNum& other){
+	if((*this) <= other) {return false;}
 	else{return true;}
 }
 
-bool operator>=(const BigNum& that, const BigNum& other){
-	if(that < other){return false;}
+bool BigNum::operator>=(const BigNum& other){
+	if((*this) < other){return false;}
 	else{return true;}
 }
 
 
 // Присваивание
-BigNum& operator=(BigNum& that, const BigNum& other){
-	that.SIZE_INT = other.SIZE_INT;
-	that.SIZE_FRACT = other.SIZE_FRACT;
-
-	that.is_negative = other.is_negative;
-	
+BigNum& BigNum::operator=(const BigNum& other){
+	(*this).is_negative = other.is_negative;
 	long long size_int = other.integer.size();
 	long long size_fract = other.fractional.size();
 
-	that.integer.resize(size_int);
-	that.fractional.resize(size_fract);
+	(*this).integer.resize(size_int);
+	(*this).fractional.resize(size_fract);
 
 	for (long long i = 0; i < size_int; i++){
-		that.integer[i] = other.integer[i];
+		(*this).integer[i] = other.integer[i];
 	}
 
 	for (long long i = 0; i < size_fract; i++){
-		that.fractional[i] = other.fractional[i];
+		(*this).fractional[i] = other.fractional[i];
 	}
+	// std::cout << integer[0] << std::endl;
 
-	return that;
+	return (*this);
 }
 
-BigNum& operator=(BigNum& that, const std::string str){
-	BigNum p = bignum_create(str);
-	that = p;
-	return that;
+BigNum& BigNum::operator=(const char* str){
+	(*this) = bignum_create(str);
+	return (*this);
 }
 
-BigNum& operator+=(BigNum& that, const BigNum& other){
-	long long size_int = max(that.integer.size(), other.integer.size());
+BigNum& BigNum::operator+=(const BigNum& other){
+	long long size_int = std::max((*this).integer.size(), other.integer.size());
 	
-	that.integer.resize(size_int, 0);
-	other.integer.resize(size_int, 0);
+	BigNum cpy_other = other;
 
-	long long size_fract = max(that.fractional.size(), other.fractional.size())
+	integer.resize(size_int, 0);
+	cpy_other.integer.resize(size_int, 0);
 
-	auto iter_that = that.integer.cbegin();
-	auto iter_other = other.integer.cbegin();
+	long long size_fract = std::max((*this).fractional.size(), cpy_other.fractional.size());
 
-	that.integer.insert(iter_that, that.fractional.size() - size_fract, 0);
-	other.integer.insert(iter_other, other.fractional.size() - size_fract, 0);
+	// auto iter_this = integer.cbegin();
+	// auto iter_other = other.integer.cbegin();
 
-	if (that.is_negative == other.is_negative){
+	integer.insert(integer.cbegin(), fractional.size() - size_fract, 0);
+	cpy_other.integer.insert(cpy_other.integer.cbegin(), cpy_other.fractional.size() - size_fract, 0);
+
+	if ((*this).is_negative == cpy_other.is_negative){
 		int need_plus = 0;
 		for (long long i = 0; i < size_fract; i++){
-			that.fractional[i]+=other.fractional[i];
-			if(that.fractional[i] >= that.BASE){
-				that.fractional[i]-=that.BASE;
+			(*this).fractional[i]+=cpy_other.fractional[i];
+			if((*this).fractional[i] >= (*this).BASE){
+				(*this).fractional[i]-=(*this).BASE;
 				if(i + 1 != size_fract){
-					that.fractional[i+1] += 1;
+					(*this).fractional[i+1] += 1;
 				}
 				else{
 					need_plus = 1;
 				}
 			}
 		}
-		that.integer[0] += need_plus;
+		(*this).integer[0] += need_plus;
 
 		for (long long i = 0; i < size_int; i++){
-			that.integer[i]+=other.integer[i];
-			if(that.integer[i] >= that.BASE){
-				that.integer[i]-=that.BASE;
+			(*this).integer[i]+=cpy_other.integer[i];
+			if((*this).integer[i] >= (*this).BASE){
+				(*this).integer[i]-=(*this).BASE;
 				if(i + 1 != size_int){
-					that.integer[i+1] += 1;
+					(*this).integer[i+1] += 1;
 				}
 				else{
-					that.integer.push_back(1);
+					(*this).integer.push_back(1);
 				}
 			}
 		}
 	}
 
 	else{
-		if ((that.is_negative == true && (-that) > other) || (that.is_negative == false && (-that) < other)){
+		if (((*this).is_negative == true && (-(*this)) > cpy_other) || ((*this).is_negative == false && (-(*this)) < cpy_other)){
 			int need_minus = 0;
 			for (long long i = 0; i < size_fract; i++){
-				that.fractional[i]-=other.fractional[i];
-				if(that.fractional[i] < 0){
-					that.fractional[i]+=that.BASE;
+				(*this).fractional[i]-=cpy_other.fractional[i];
+				if((*this).fractional[i] < 0){
+					(*this).fractional[i]+=(*this).BASE;
 					if(i + 1 != size_fract){
-						that.fractional[i+1] -= 1;
+						(*this).fractional[i+1] -= 1;
 					}
 					else{
 						need_minus = 1;
 					}
 				}
 			}
-			that.integer[0] += need_plus;
+			(*this).integer[0] -= need_minus;
 
 			for (long long i = 0; i < size_int; i++){
-				that.integer[i]-=other.integer[i];
-				if(that.integer[i] < 0){
-					that.integer[i]+=that.BASE;
-					that.integer[i+1] -= 1;
+				(*this).integer[i]-=cpy_other.integer[i];
+				if((*this).integer[i] < 0){
+					(*this).integer[i]+=(*this).BASE;
+					(*this).integer[i+1] -= 1;
 				}
 			}
 		}
 		
-		else if((that.is_negative == true && that <= other) || (that.is_negative == false && (-that) >= other)){
+		else if(((*this).is_negative == true && (*this) <= cpy_other) || ((*this).is_negative == false && (-(*this)) >= cpy_other)){
+			// std::cout << "lol" << std::endl;
 			BigNum help = other;
 			int need_minus = 0;
 			for (long long i = 0; i < size_fract; i++){
-				help.fractional[i]-=that.fractional[i];
+				help.fractional[i]-=(*this).fractional[i];
 				if(help.fractional[i] < 0){
 					help.fractional[i]+=help.BASE;
 					if(i + 1 != size_fract){
@@ -324,132 +370,138 @@ BigNum& operator+=(BigNum& that, const BigNum& other){
 					}
 				}
 			}
-			help.integer[0] += need_plus;
+			// std::cout << size_int << std::endl;
+			help.integer[0] -= need_minus;
 
 			for (long long i = 0; i < size_int; i++){
-				help.integer[i]-=that.integer[i];
+				help.integer[i]-=(*this).integer[i];
 				if(help.integer[i] < 0){
 					help.integer[i]+=help.BASE;
 					help.integer[i+1] -= 1;
 				}
 			}
+
 			delete_zeros(help);			
-			that = help;
+			// std::cout << help.integer[0] << std::endl;
+			(*this) = help;
+			// std::cout << integer[0] << std::endl;
 		}
 
 	}
+	return (*this);
 }
 
-BigNum& operator-=(BigNum& that, const BigNum& other){
-	that += (-other);
-	return that;
+BigNum& BigNum::operator-=(const BigNum& other){
+	BigNum cpy_other = -other;
+	(*this) += cpy_other;
+	return (*this);
 }
 
-BigNum& operator*=(BigNum& that, const BigNum& other){
+BigNum& BigNum::operator*=(const BigNum& other){
 	
-	that.is_negative = that.is_negative != other.is_negative;
+	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
 	long long size_other = other.integer.size() + other.fractional.size();
-	long long size_that = that.integer.size() + that.fractional.size();
+	long long size_this = (*this).integer.size() + (*this).fractional.size();
 	std::vector<long long> ans;
-	ans.resize(size_other+size_that, 0);
+	ans.resize(size_other+size_this, 0);
 	long long ans_size = ans.size();
 
-	std::vector<long long> that_num = that.fractional;
+	std::vector<long long> this_num = (*this).fractional;
 	std::vector<long long> other_num = other.fractional;
 
-	long long size_int_that = that.integer.size();
+	long long size_int_this = (*this).integer.size();
 	long long size_int_other = other.integer.size();
 
-	long long ans_point = that.fractional.size() + other.fractional.size();
+	long long ans_point = (*this).fractional.size() + other.fractional.size();
 
-	for (long long i = 0; i < size_int_that; i++){
-		that_num.push_back(that.integer[i]);
+	for (long long i = 0; i < size_int_this; i++){
+		this_num.push_back((*this).integer[i]);
 	}
 	for (long long i = 0; i < size_int_other; i++){
 		other_num.push_back(other.integer[i]);
 	}
 
 
-	for (long long i = 0; i < size_that; i++){
+	for (long long i = 0; i < size_this; i++){
 		for(long long j = 0; j < size_other; j++){
 			if(i+j == ans_size){
-				ans.push_back(that_num[i]*other_num[j]);
+				ans.push_back(this_num[i]*other_num[j]);
 				ans_size++;
 			}
 			else{
-				ans[i+j] += that_num[i]*other_num[j]; 
+				ans[i+j] += this_num[i]*other_num[j]; 
 			}
 		}
 	}
 
 	for (long long i = 0; i < ans_size; i++){
-		if(ans[i] >= that.BASE){
+		if(ans[i] >= (*this).BASE){
 			if(i+1 == ans_size){
-				ans.push_back(ans[i] / that.BASE);
+				ans.push_back(ans[i] / (*this).BASE);
 			}
 			else{
-				ans[i+1] += ans[i] / that.BASE;
+				ans[i+1] += ans[i] / (*this).BASE;
 			}
-			ans[i] %= that.BASE;
+			ans[i] %= (*this).BASE;
 		}
 	}
 
-	that.integer.resize(size_ans - ans_point);
-	that.fractional.resize(ans_point);
+	(*this).integer.resize(ans_size - ans_point);
+	(*this).fractional.resize(ans_point);
 	for (long long i = 0; i < ans_point; i++){
-		that.fractional[i] = ans[i];
+		(*this).fractional[i] = ans[i];
 	}
-	for (long long i = ans_point; i < size_ans; i++){
-		that.integer[i-ans_point] = ans[i];
+	for (long long i = ans_point; i < ans_size; i++){
+		(*this).integer[i-ans_point] = ans[i];
 	}
 
-	delete_zeros(that);
+	delete_zeros((*this));
 
-	return that;
+	return (*this);
 }
 
-BigNum& operator/=(BigNum& that, const BigNum& other){
+BigNum& BigNum::operator/=(const BigNum& other){
 
-	that.is_negative = that.is_negative != other.is_negative;
+	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
-	long long size_that = that.integer.size() + that.fractional.size();
+	long long size_this = (*this).integer.size() + (*this).fractional.size();
 	long long size_other = other.integer.size() + other.fractional.size();
 	
 	std::vector<long long> ans;
-	std::vector<long long> that_num = that.fractional;
+	std::vector<long long> this_num = (*this).fractional;
 	std::vector<long long> other_num = other.fractional;
 	std::vector<long long> help;
 
 
-	long long size_int_that = that.integer.size();
+	long long size_int_this = (*this).integer.size();
 	long long size_int_other = other.integer.size();
 
-	long long ans_point = that.fractional.size() - other.fractional.size();
+	long long ans_point = (*this).fractional.size() - other.fractional.size();
 
-	for (long long i = 0; i < size_int_that; i++){
-		that_num.push_back(that.integer[i]);
+	for (long long i = 0; i < size_int_this; i++){
+		this_num.push_back((*this).integer[i]);
 	}
 	for (long long i = 0; i < size_int_other; i++){
 		other_num.push_back(other.integer[i]);
 	}
 
 	for (long long i = 0; i < size_other; i++){
-		that_num.push_back(0);
+		this_num.push_back(0);
 	}
 
 
 	long long precision = 0;
-	for (long long i = 0; i < size_that + size_other; i++){
-		if (i < size_that){
-			help.emplace(help.cbegin(), that_num[i]);
+	for (long long i = 0; i < size_this + size_other; i++){
+		if (i < size_this){
+			help.emplace(help.cbegin(), this_num[i]);
 			ans.emplace(ans.cbegin(), 0);
 			if (help < other_num){continue;}
 			else{
 				while(! (help < other_num)){
 					help-=other_num;
 					ans[0]+=1;
-					if (is_vec_zero(help) && i+1 == size_that){
+					if (is_vec_zero(help) && i+1 == size_this){
 						break;
 					}
 				}
@@ -459,7 +511,7 @@ BigNum& operator/=(BigNum& that, const BigNum& other){
 			precision+=1;
 			if (is_vec_zero(help)){break;}
 			else{
-				help.emplace(help.cbegin(), that_num[i]);
+				help.emplace(help.cbegin(), this_num[i]);
 				ans.emplace(ans.cbegin(), 0);
 				if (help < other_num){continue;}
 				else{
@@ -477,24 +529,24 @@ BigNum& operator/=(BigNum& that, const BigNum& other){
 
 	ans_point+=precision;
 	long long size_ans = ans.size();
-	that.integer.clear();
-	that.fractional.clear();
+	(*this).integer.clear();
+	(*this).fractional.clear();
 	if(ans_point > 0){
 		for (long long i = 0; i < ans_point && i < size_ans; i++){
-			that.fractional.push_back(ans[i]);
+			(*this).fractional.push_back(ans[i]);
 		}
 		for(long long i = ans_point; i < size_ans; i++){
-			that.integer.push_back(ans[i]);
+			(*this).integer.push_back(ans[i]);
 		}
 	}
 	else{
 		ans_point = -ans_point;
-		that.integer.resize(ans_point, 0);
+		(*this).integer.resize(ans_point, 0);
 		for (long long i = 0; i < size_ans; i++){
-			that.integer.push_back(ans[i]);
+			(*this).integer.push_back(ans[i]);
 		}
 	}
-	return that;
+	return (*this);
 }
 
 
