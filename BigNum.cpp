@@ -1,4 +1,4 @@
-#include "BigNum-version-2.hpp"
+#include "BigNum.hpp"
 
 
 
@@ -35,6 +35,8 @@ BigNum BigNum::bignum_create(const char* strch){
 			else{help.integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
 		}
 
+		help.fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
+		len_fract-=len_fract%9;
 		for (long long i = len_fract; i>=0; i-=9){
 			if (i < 9){
 				help.fractional.push_back(std::stoll(str_fractional.substr(0, i)) * pow(10, 9-i));
@@ -61,7 +63,7 @@ BigNum::BigNum(const std::string strcon){
 
 	if (found_point == std::string::npos){
 		
-		for (long long i = len; i>=0; i-=9){
+		for (long long i = len; i>0; i-=9){
 			if (i < 9){integer.push_back(std::stoll(str.substr(0, i)));}
 			else{integer.push_back(std::stoll(str.substr(i-9, 9)));}
 		}
@@ -73,12 +75,15 @@ BigNum::BigNum(const std::string strcon){
 		long long len_int = str_integer.length();
 		long long len_fract = str_fractional.length();
 
-		for (long long i = len_int; i>=0; i-=9){
+		for (long long i = len_int; i>0; i-=9){
 			if (i < 9){integer.push_back(std::stoll(str_integer.substr(0, i)));}
 			else{integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
 		}
 
-		for (long long i = len_fract; i>=0; i-=9){
+		fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
+		len_fract-=len_fract%9;
+		
+		for (long long i = len_fract; i>0; i-=9){
 			if (i < 9){fractional.push_back(std::stoll(str_fractional.substr(0, i)) * pow(10, 9-i));}
 			else{fractional.push_back(std::stoll(str_fractional.substr(i-9, 9)));}
 		}		
@@ -106,7 +111,7 @@ BigNum& delete_zeros(BigNum& that){
 	}
 
 	for (long long i = 0; i < size_fract; i++){
-		if(that.fractional[i] == 0){
+		if(that.fractional[i] == 0 && i != size_fract - 1){
 			that.fractional.erase(iter_fract);
 			iter_fract = that.fractional.cbegin();
 		}
@@ -114,8 +119,8 @@ BigNum& delete_zeros(BigNum& that){
 			break;
 		}
 	}
-	if (that.fractional.size() == 0 && that.integer.size() == 1 && that.integer[0] == 0){
-		that.is_negative = false;
+	if ((that.fractional.size() == 0 || that.fractional.size() == 1) && that.integer.size() == 1 && that.integer[0] == 0){
+		that.is_negative = false; 
 	}
 
 	return that;
@@ -361,7 +366,6 @@ BigNum& BigNum::operator+=(const BigNum& other){
 		}
 		
 		else if(((*this).is_negative == true && (*this) <= cpy_other) || ((*this).is_negative == false && (-(*this)) >= cpy_other)){
-			
 			BigNum help = other;
 			int need_minus = 0;
 			for (long long i = 0; i < size_fract; i++){
@@ -388,7 +392,7 @@ BigNum& BigNum::operator+=(const BigNum& other){
 			}
 
 			delete_zeros(help);			
-			
+			// std::cout << help.fractional.size() << std::endl;
 			(*this) = help;
 			
 		}

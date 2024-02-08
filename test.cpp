@@ -1,12 +1,14 @@
 #include <iostream>
-#include "BigNum-version-2.hpp"
+#include "BigNum.hpp"
 
 
 int main(){
-	BigNum a = "1.57";
-	BigNum b = "12345654.553";
-	b-=a;
-	std::cout << b.integer[0] << std::endl;
-	std::cout << b.fractional[0] << std::endl;
+	BigNum a = "-1.572352";
+	// std::cout << "lol" << std::endl;
+	BigNum b = "12345654.553362";
+	a*=b;
+	std::cout << a.is_negative << std::endl;
+	std::cout << a.integer[0] << std::endl;
+	std::cout << a.fractional[1] << std::endl;
 	return 0;
 }
