@@ -34,9 +34,10 @@ BigNum BigNum::bignum_create(const char* strch){
 			if (i < 9){help.integer.push_back(std::stoll(str_integer.substr(0, i)));}
 			else{help.integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
 		}
-
-		help.fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
-		len_fract-=len_fract%9;
+		if(len_fract%9 != 0){
+			help.fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
+			len_fract-=len_fract%9;
+		}
 		for (long long i = len_fract; i>=0; i-=9){
 			if (i < 9){
 				help.fractional.push_back(std::stoll(str_fractional.substr(0, i)) * pow(10, 9-i));
@@ -80,8 +81,10 @@ BigNum::BigNum(const std::string strcon){
 			else{integer.push_back(std::stoll(str_integer.substr(i-9, 9)));}
 		}
 
-		fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
-		len_fract-=len_fract%9;
+		if(len_fract%9 != 0){
+			help.fractional.push_back(std::stoll(str_fractional.substr(len_fract - len_fract%9, len_fract%9)) * pow(10, 9-len_fract%9));
+			len_fract-=len_fract%9;
+		}
 		
 		for (long long i = len_fract; i>0; i-=9){
 			if (i < 9){fractional.push_back(std::stoll(str_fractional.substr(0, i)) * pow(10, 9-i));}
