@@ -1,13 +1,5 @@
 #include <BigNum-version-2.hpp>
 
-#include <cassert>
-#include <cstring>
-#include <cmath>
-#include <algorithm>
-#include <vector>
-
-#define base 1000*1000*1000
-
 
 using namespace BigNumSpace;
 
@@ -103,6 +95,15 @@ std::vector<long long>& operator-=(std::vector<long long>& that, const std::vect
 	}
 	return that;
 }
+
+bool is_vec_zero(std::vector<long long>& that){
+	long long size = that.size();
+	for (long long i = 0; i < size; i++){
+		if (that[i] != 0){return false;}
+	}
+	return true;
+}
+
 
 
 // Унарный минус
@@ -229,6 +230,12 @@ BigNum& operator=(BigNum& that, const BigNum& other){
 		that.fractional[i] = other.fractional[i];
 	}
 
+	return that;
+}
+
+BigNum& operator=(BigNum& that, const std::string str){
+	BigNum p = bignum_create(str);
+	that = p;
 	return that;
 }
 
@@ -413,7 +420,6 @@ BigNum& operator/=(BigNum& that, const BigNum& other){
 	std::vector<long long> that_num = that.fractional;
 	std::vector<long long> other_num = other.fractional;
 	std::vector<long long> help;
-	bool flag_ans_point = 0;
 
 
 	long long size_int_that = that.integer.size();
@@ -428,13 +434,67 @@ BigNum& operator/=(BigNum& that, const BigNum& other){
 		other_num.push_back(other.integer[i]);
 	}
 
+	for (long long i = 0; i < size_other; i++){
+		that_num.push_back(0);
+	}
+
+
+	long long precision = 0;
 	for (long long i = 0; i < size_that + size_other; i++){
-		if (i < size_int){
+		if (i < size_that){
 			help.emplace(help.cbegin(), that_num[i]);
+			ans.emplace(ans.cbegin(), 0);
 			if (help < other_num){continue;}
 			else{
-				help-=other_num;
+				while(! (help < other_num)){
+					help-=other_num;
+					ans[0]+=1;
+					if (is_vec_zero(help) && i+1 == size_that){
+						break;
+					}
+				}
 			}
 		}
-	}	
+		else{
+			precision+=1;
+			if (is_vec_zero(help)){break;}
+			else{
+				help.emplace(help.cbegin(), that_num[i]);
+				ans.emplace(ans.cbegin(), 0);
+				if (help < other_num){continue;}
+				else{
+					while(! (help < other_num)){
+						help-=other_num;
+						ans[0]+=1;
+						if (is_vec_zero(help)){
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ans_point+=precision;
+	long long size_ans = ans.size();
+	that.integer.clear();
+	that.fractional.clear();
+	if(ans_point > 0){
+		for (long long i = 0; i < ans_point && i < size_ans; i++){
+			that.fractional.push_back(ans[i]);
+		}
+		for(long long i = ans_point; i < size_ans; i++){
+			that.integer.push_back(ans[i]);
+		}
+	}
+	else{
+		ans_point = -ans_point;
+		that.integer.resize(ans_point, 0);
+		for (long long i = 0; i < size_ans; i++){
+			that.integer.push_back(ans[i]);
+		}
+	}
+	return that;
 }
+
+
