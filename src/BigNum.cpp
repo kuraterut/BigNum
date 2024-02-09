@@ -137,7 +137,6 @@ std::string to_string(const BigNum& num)
 		}
 		else if(i != size_int-1 && num.integer[i] < 100){
 			os << "0";
-			std::cout << num.integer[i] << std::endl;
 			os << std::to_string(num.integer[i]);
 		}    	
 		else{
@@ -170,17 +169,16 @@ BigNum& delete_zeros(BigNum& that){
 	long long size_fract = that.fractional.size();
 	auto iter_int = that.integer.cbegin();
 	auto iter_fract = that.fractional.cbegin();
-
-	for (long long i = 0; i < size_int; i++){
-		if(that.integer[i] == 0 && i != size_int-1){
-			that.integer.erase(iter_int);
+	
+	for (long long i = size_int-1; i >= 0; i--){
+		if(that.integer[i] == 0 && i != 0){
+			that.integer.erase(iter_int+i);
 			iter_int = that.integer.cbegin();
 		}
 		else{
 			break;
 		}
 	}
-
 	for (long long i = 0; i < size_fract; i++){
 		if(that.fractional[i] == 0 && i != size_fract - 1){
 			that.fractional.erase(iter_fract);
@@ -190,7 +188,7 @@ BigNum& delete_zeros(BigNum& that){
 			break;
 		}
 	}
-	if ((that.fractional.size() == 0 || that.fractional.size() == 1) && that.integer.size() == 1 && that.integer[0] == 0){
+	if ((that.fractional.size() == 0 || (that.fractional.size() == 1 && that.fractional[0] == 0)) && that.integer.size() == 1 && that.integer[0] == 0){
 		that.is_negative = false; 
 	}
 
@@ -639,25 +637,25 @@ BigNum& BigNum::operator/=(const BigNum& other){
 
 // Арифметика
 
-BigNum operator+(const BigNum& other){
+BigNum BigNum::operator+(const BigNum& other){
 	BigNum p = (*this);
 	p+=other;
 	return p;
 }
 
-BigNum operator-(const BigNum& other){
+BigNum BigNum::operator-(const BigNum& other){
 	BigNum p = (*this);
 	p-=other;
 	return p;
 }
 
-BigNum operator*(const BigNum& other){
+BigNum BigNum::operator*(const BigNum& other){
 	BigNum p = (*this);
 	p*=other;
 	return p;
 }
 
-BigNum operator/(const BigNum& other){
+BigNum BigNum::operator/(const BigNum& other){
 	BigNum p = (*this);
 	p/=other;
 	return p;
