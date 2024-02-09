@@ -637,4 +637,28 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	return (*this);
 }
 
+// Арифметика
 
+BigNum operator+(const BigNum& other){
+	BigNum p = (*this);
+	p+=other;
+	return p;
+}
+
+BigNum operator-(const BigNum& other){
+	BigNum p = (*this);
+	p-=other;
+	return p;
+}
+
+BigNum operator*(const BigNum& other){
+	BigNum p = (*this);
+	p*=other;
+	return p;
+}
+
+BigNum operator/(const BigNum& other){
+	BigNum p = (*this);
+	p/=other;
+	return p;
+}
