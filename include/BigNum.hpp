@@ -34,7 +34,7 @@ struct BigNum
 	BigNum operator-(const BigNum& other);
 	BigNum operator*(const BigNum& other);
 	BigNum operator/(const BigNum& other);
-
+	BigNum operator%(const BigNum& other);
 	// Присваивание
 	BigNum& operator=(const BigNum& other);
 	BigNum& operator=(const char* str);

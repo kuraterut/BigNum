@@ -148,11 +148,11 @@ std::string to_string(const BigNum& num)
     }
 
     for (long long i = size_fract-1; i >= 0; i--){
-    	if(i != size_fract-1 && num.fractional[i] < 10){
+    	if(num.fractional[i] < 10){
 			os << "00";
 			os << std::to_string(num.fractional[i]);	
 		}
-		else if(i != size_fract-1 && num.fractional[i] < 100){
+		else if(num.fractional[i] < 100){
 			os << "0";
 			os << std::to_string(num.fractional[i]);
 		}    	
@@ -223,6 +223,19 @@ std::vector<long long>& operator-=(std::vector<long long>& that, const std::vect
 			else{
 				that.pop_back();
 			}
+		}
+	}
+	return that;
+}
+
+std::vector<long long>& delete_zeros_vec(std::vector<long long>& that){
+	long long size = that.size();
+	for (long long i = size-1; i >= 0; i--){
+		if(i != 0 && that[i] == 0){
+			that.pop_back();
+		}
+		else{
+			break;
 		}
 	}
 	return that;
@@ -379,10 +392,10 @@ BigNum& BigNum::operator+=(const BigNum& other){
 	
 	long long size_fract = std::max((*this).fractional.size(), cpy_other.fractional.size());
 
+
 	fractional.insert(fractional.cbegin(), abs(fractional.size() - size_fract), 0);
 	
 	cpy_other.fractional.insert(cpy_other.fractional.cbegin(), abs(cpy_other.fractional.size() - size_fract), 0);
-
 
 	if ((*this).is_negative == cpy_other.is_negative){
 		int need_plus = 0;
@@ -442,15 +455,15 @@ BigNum& BigNum::operator+=(const BigNum& other){
 			}
 		}
 		
-		else if(((*this).is_negative == true && (*this) <= cpy_other) || ((*this).is_negative == false && (-(*this)) >= cpy_other)){
-			BigNum help = other;
+		else if(((*this).is_negative == true && (-(*this)) <= cpy_other) || ((*this).is_negative == false && (-(*this)) >= cpy_other)){
 			int need_minus = 0;
+
 			for (long long i = 0; i < size_fract; i++){
-				help.fractional[i]-=(*this).fractional[i];
-				if(help.fractional[i] < 0){
-					help.fractional[i]+=help.BASE;
+				cpy_other.fractional[i]-=(*this).fractional[i];
+				if(cpy_other.fractional[i] < 0){
+					cpy_other.fractional[i]+=cpy_other.BASE;
 					if(i + 1 != size_fract){
-						help.fractional[i+1] -= 1;
+						cpy_other.fractional[i+1] -= 1;
 					}
 					else{
 						need_minus = 1;
@@ -458,22 +471,22 @@ BigNum& BigNum::operator+=(const BigNum& other){
 				}
 			}
 			
-			help.integer[0] -= need_minus;
+			cpy_other.integer[0] -= need_minus;
 
 			for (long long i = 0; i < size_int; i++){
-				help.integer[i]-=(*this).integer[i];
-				if(help.integer[i] < 0){
-					help.integer[i]+=help.BASE;
-					help.integer[i+1] -= 1;
+				cpy_other.integer[i]-=(*this).integer[i];
+				if(cpy_other.integer[i] < 0){
+					cpy_other.integer[i]+=cpy_other.BASE;
+					cpy_other.integer[i+1] -= 1;
 				}
 			}
-
-			delete_zeros(help);			
-			(*this) = help;
+			
+			(*this) = cpy_other;
 			
 		}
 
 	}
+	delete_zeros((*this));
 	return (*this);
 }
 
@@ -547,6 +560,13 @@ BigNum& BigNum::operator*=(const BigNum& other){
 	return (*this);
 }
 
+bool is_zero(const BigNum& that){
+	BigNum zero1 = "0";
+	BigNum zero2 = "0.0";
+	if (zero1 == that || zero2 == that){return true;}
+	else{return false;}
+}
+
 BigNum& BigNum::operator/=(const BigNum& other){
 
 	(*this).is_negative = (*this).is_negative != other.is_negative;
@@ -554,10 +574,14 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	long long size_this = (*this).integer.size() + (*this).fractional.size();
 	long long size_other = other.integer.size() + other.fractional.size();
 	
-	std::vector<long long> ans;
+	// std::vector<long long> ans;
+	// std::vector<long long> help;
+	BigNum ans, help, other_num;
+	ans.is_negative = false;
+	help.is_negative = false;
+	other_num.is_negative = false;
 	std::vector<long long> this_num = (*this).fractional;
-	std::vector<long long> other_num = other.fractional;
-	std::vector<long long> help;
+	other_num.integer = other.fractional;
 
 
 	long long size_int_this = (*this).integer.size();
@@ -569,7 +593,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 		this_num.push_back((*this).integer[i]);
 	}
 	for (long long i = 0; i < size_int_other; i++){
-		other_num.push_back(other.integer[i]);
+		other_num.integer.push_back(other.integer[i]);
 	}
 
 	for (long long i = 0; i < size_other; i++){
@@ -577,33 +601,37 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	}
 
 	long long precision = 0;
+
 	for (long long i = 0; i < size_this + size_other; i++){
 		if (i < size_this){
-			help.emplace(help.cbegin(), this_num[size_this+size_other-i-1]);
-			ans.emplace(ans.cbegin(), 0);
+			help.integer.emplace(help.integer.cbegin(), this_num[size_this+size_other-i-1]);
+			delete_zeros(help);
+			ans.integer.emplace(ans.integer.cbegin(), 0);
 			if (help < other_num){continue;}
 			else{
 				while((help < other_num) == 0){
 					help-=other_num;
-					ans[0]+=1;
-					if (is_vec_zero(help) && i+1 == size_this){
+					ans.integer[0]+=1;
+					if (is_zero(help) && i+1 == size_this){
 						break;
 					}
 				}
 			}
 		}
 		else{
-			if (is_vec_zero(help)){break;}
+			if (is_zero(help)){break;}
 			else{
 				precision+=1;
-				help.emplace(help.cbegin(), this_num[size_this+size_other-i-1]);
-				ans.emplace(ans.cbegin(), 0);
+				help.integer.emplace(help.integer.cbegin(), this_num[size_this+size_other-i-1]);
+				delete_zeros(help);
+				ans.integer.emplace(ans.integer.cbegin(), 0);
 				if (help < other_num){continue;}
 				else{
 					while((help < other_num) == 0){
 						help-=other_num;
-						ans[0]+=1;				
-						if (is_vec_zero(help)){
+						ans.integer[0]+=1;				
+						if(ans.integer[0] == 648){std::cout <<  "lol"<< std::endl;}
+						if (is_zero(help)){
 							break;
 						}
 					}
@@ -614,26 +642,120 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	
 
 	ans_point+=precision;
-	long long size_ans = ans.size();
+	long long size_ans = ans.integer.size();
 	(*this).integer.clear();
 	(*this).fractional.clear();
 	if(ans_point > 0){
 		for (long long i = 0; i < ans_point && i < size_ans; i++){
-			(*this).fractional.push_back(ans[i]);
+			(*this).fractional.push_back(ans.integer[i]);
 		}
 		for(long long i = ans_point; i < size_ans; i++){
-			(*this).integer.push_back(ans[i]);
+			(*this).integer.push_back(ans.integer[i]);
 		}
 	}
 	else{
 		ans_point = -ans_point;
 		(*this).integer.resize(ans_point, 0);
 		for (long long i = 0; i < size_ans; i++){
-			(*this).integer.push_back(ans[i]);
+			(*this).integer.push_back(ans.integer[i]);
 		}
 	}
+	delete_zeros((*this));
 	return (*this);
 }
+
+// void shift_right(BigNum& that) {
+//         if (that.integer.size() == 0) {
+//                 that.integer.push_back(0);
+//                 return;
+//         }
+//         that.integer.push_back(that.integer[that.integer.size() - 1]);
+//         // здесь размер массива равен как минимум двум и перебор идет до предпоследнего разряда,
+//         // поэтому i имеет "верный" тип size_t
+//         long long size = that.integer.size() - 2; 
+//         for (long long i = size; i > 0; i--) {that.integer[i] = that.integer[i - 1];}
+//         that.integer[0] = 0;
+//     // that.is_negative = false;
+// }
+
+// BigNum& BigNum::operator/=(const BigNum& other){
+// 	BigNum zero1 = "0"_bn;
+// 	BigNum zero2 = "0.0"_bn;
+// 	BigNum b = other;
+// 	if (zero1 == other || zero2 == other) {return (*this);};
+// 	long long size_int = integer.size();
+// 	if(b.fractional.size() != 0){
+// 		if(b.fractional[0] % 100 == 0){b.fractional[0]/=100;}
+// 		if(b.fractional[0] % 10 == 0){b.fractional[0]/=10;}
+// 	}
+
+// 	if(fractional.size() != 0){
+// 		if(fractional[0] % 100 == 0){fractional[0]/=100;}
+// 		if(fractional[0] % 10 == 0){fractional[0]/=10;}
+// 	}
+
+// 	for(long long i = 0; i < size_int; i++){
+// 		fractional.push_back(integer[i]);
+// 	}
+    
+//     size_int = b.integer.size();
+// 	for(long long i = 0; i < size_int; i++){
+// 		b.fractional.push_back(b.integer[i]);
+// 	}
+
+	
+
+// 	b.integer = b.fractional;
+// 	integer = fractional;
+
+// 	b.fractional.clear();
+// 	fractional.clear();
+
+	
+
+//    	std::cout << b << std::endl; 
+
+//     b.is_negative = false;
+//     BigNum result, current;
+//     current.is_negative = false;
+//     result.integer.resize(integer.size());
+
+//     long long size_this = (integer.size()) - 1;
+
+//     for (long long i = size_this; i >= 0; i--) {
+//             shift_right(current);
+            
+//             current.integer[0] = integer[i];
+//             delete_zeros(current);
+//             int x = 0, l = 0, r = base;
+//             while (l <= r) {
+//                 int m = (l + r) / 2;
+//                 BigNum t = b * BigNum(std::to_string(m));
+//                 if (t <= current) {
+//                     x = m;
+//                     l = m + 1;
+//                 }
+                
+//                 else {r = m - 1;}
+                
+//             }
+ 
+//             result.integer[i] = x;
+//             current = current - b * BigNum(std::to_string(x));
+//         }
+ 
+//     result.is_negative = is_negative != b.is_negative;
+//     delete_zeros(result);
+//     (*this) = result;
+//     return (*this);
+// }
+
+// BigNum BigNum::operator %(const BigNum& other) {
+//         BigNum result = (*this) - ((*this) / other) * other;
+//         // std::cout << ((*this)/other) << std::endl;
+//         if (result.is_negative) {result += other;}
+//         return result;
+// }
 
 // Арифметика
 

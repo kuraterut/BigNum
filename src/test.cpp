@@ -3,10 +3,10 @@
 
 
 int main(){
-	BigNum a = "0.32145"_bn;
-	BigNum b = "1";
-	a*=b;
+	BigNum a = "4572.7234"_bn;
+	BigNum b = "161124512.51";
+	BigNum c = b*a;
 
-	std::cout << a << std::endl;
+	std::cout << c << std::endl;
 	return 0;
 }
