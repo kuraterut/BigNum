@@ -8,8 +8,9 @@
 #include <algorithm>
 #include <vector>
 #include <cstdlib>
+#include <sstream>
 
-#define base 1000*1000*1000
+#define base 1000
 
 
 struct BigNum
@@ -27,10 +28,6 @@ struct BigNum
 	
 	// Создание числа
 	BigNum bignum_create(const char* strch);
-
-
-    // Унарный минус
-	// BigNum operator-(const BigNum& other);
 	
 	// Арифметика
 	BigNum operator+(const BigNum& other);
@@ -54,18 +51,26 @@ struct BigNum
 	bool operator<=(const BigNum& other);
 	bool operator>=(const BigNum& other);
     
-    // Вывод числа
-	// std::string operator<<(const BigNum& that);
-
-	// Литерал с плавающей точкой
 
 	// Число pi 
 
 
 };
 
-	
-	
+// Литерал с плавающей точкой
+BigNum operator ""_bn(const char* lit, size_t);
+BigNum operator ""_bn(long double num);
+
+// Вывод числа
+// std::string operator<<(const BigNum& that);
+
+std::ostream& operator <<(std::ostream& os, const BigNum& num);
+std::string to_string(const BigNum& num);
+
+// Унарный минус
+BigNum operator-(const BigNum& other);
+
+
 
 #endif
 
