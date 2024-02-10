@@ -595,12 +595,14 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	for (long long i = 0; i < size_int_other; i++){
 		other_num.integer.push_back(other.integer[i]);
 	}
+	delete_zeros(other_num);
 
 	for (long long i = 0; i < size_other; i++){
 		this_num.emplace(this_num.cbegin(), 0);
 	}
 
 	long long precision = 0;
+
 
 	for (long long i = 0; i < size_this + size_other; i++){
 		if (i < size_this){
@@ -630,7 +632,6 @@ BigNum& BigNum::operator/=(const BigNum& other){
 					while((help < other_num) == 0){
 						help-=other_num;
 						ans.integer[0]+=1;				
-						if(ans.integer[0] == 648){std::cout <<  "lol"<< std::endl;}
 						if (is_zero(help)){
 							break;
 						}
