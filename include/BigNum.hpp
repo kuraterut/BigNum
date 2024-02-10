@@ -18,6 +18,7 @@ struct BigNum
 	BigNum() = default;
 	BigNum(const char* str);
 	BigNum(const std::string strcon);
+	BigNum(const long long num);
 
 	static const long long BASE = base;
 	

@@ -93,8 +93,8 @@ BigNum::BigNum(const std::string strcon){
 	}
 }
 
-BigNum::BigNum(const char* str) : BigNum(std::string(str))
-{}
+BigNum::BigNum(const char* str) : BigNum(std::string(str)){}
+BigNum::BigNum(const long long num) : BigNum(std::to_string(num)){}
 
 // Создание литерала с плавающей точкой
 
@@ -571,9 +571,13 @@ BigNum& BigNum::operator/=(const BigNum& other){
 
 	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
+	for (long long i = 0; i < 35; i++){
+		(*this).fractional.emplace((*this).fractional.cbegin(), 0);
+	}
+
 	long long size_this = (*this).integer.size() + (*this).fractional.size();
 	long long size_other = other.integer.size() + other.fractional.size();
-	
+
 	// std::vector<long long> ans;
 	// std::vector<long long> help;
 	BigNum ans, help, other_num;
@@ -582,6 +586,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	other_num.is_negative = false;
 	std::vector<long long> this_num = (*this).fractional;
 	other_num.integer = other.fractional;
+
 
 
 	long long size_int_this = (*this).integer.size();
