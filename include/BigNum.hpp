@@ -70,6 +70,7 @@ std::string to_string(const BigNum& num);
 
 // Унарный минус
 BigNum operator-(const BigNum& other);
+BigNum Pi(long long precision_pi);
 
 
 

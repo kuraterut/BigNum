@@ -195,61 +195,6 @@ BigNum& delete_zeros(BigNum& that){
 	return that;
 }
 
-bool operator<(const std::vector<long long>& that, const std::vector<long long>& other){
-	if (that.size() < other.size()){return true;}
-	else if(that.size() > other.size()){return false;}
-	else{
-		long long size = that.size();
-		for(long long i = size-1; i >= 0; i--){
-			if(that[i] < other[i]){return true;}
-			else if(that[i] > other[i]){return false;}
-		}
-		return false;
-	}
-}
-
-std::vector<long long>& operator-=(std::vector<long long>& that, const std::vector<long long>& other){
-	long long size = other.size();
-	for (long long i = 0; i < size; i++){
-		that[i]-=other[i];
-		if(that[i] < 0){
-			that[i] += base;
-			if(that[i+1] != 0){
-				that[i+1]-=1;
-				if(that[i+1] == 0){
-					that.pop_back();
-				}
-			}
-			else{
-				that.pop_back();
-			}
-		}
-	}
-	return that;
-}
-
-std::vector<long long>& delete_zeros_vec(std::vector<long long>& that){
-	long long size = that.size();
-	for (long long i = size-1; i >= 0; i--){
-		if(i != 0 && that[i] == 0){
-			that.pop_back();
-		}
-		else{
-			break;
-		}
-	}
-	return that;
-}
-
-bool is_vec_zero(std::vector<long long>& that){
-	long long size = that.size();
-	for (long long i = 0; i < size; i++){
-		if (that[i] != 0){return false;}
-	}
-	return true;
-}
-
-
 
 // Унарный минус
 BigNum operator-(const BigNum& other){
@@ -670,99 +615,6 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	return (*this);
 }
 
-// void shift_right(BigNum& that) {
-//         if (that.integer.size() == 0) {
-//                 that.integer.push_back(0);
-//                 return;
-//         }
-//         that.integer.push_back(that.integer[that.integer.size() - 1]);
-//         // здесь размер массива равен как минимум двум и перебор идет до предпоследнего разряда,
-//         // поэтому i имеет "верный" тип size_t
-//         long long size = that.integer.size() - 2; 
-//         for (long long i = size; i > 0; i--) {that.integer[i] = that.integer[i - 1];}
-//         that.integer[0] = 0;
-//     // that.is_negative = false;
-// }
-
-// BigNum& BigNum::operator/=(const BigNum& other){
-// 	BigNum zero1 = "0"_bn;
-// 	BigNum zero2 = "0.0"_bn;
-// 	BigNum b = other;
-// 	if (zero1 == other || zero2 == other) {return (*this);};
-// 	long long size_int = integer.size();
-// 	if(b.fractional.size() != 0){
-// 		if(b.fractional[0] % 100 == 0){b.fractional[0]/=100;}
-// 		if(b.fractional[0] % 10 == 0){b.fractional[0]/=10;}
-// 	}
-
-// 	if(fractional.size() != 0){
-// 		if(fractional[0] % 100 == 0){fractional[0]/=100;}
-// 		if(fractional[0] % 10 == 0){fractional[0]/=10;}
-// 	}
-
-// 	for(long long i = 0; i < size_int; i++){
-// 		fractional.push_back(integer[i]);
-// 	}
-    
-//     size_int = b.integer.size();
-// 	for(long long i = 0; i < size_int; i++){
-// 		b.fractional.push_back(b.integer[i]);
-// 	}
-
-	
-
-// 	b.integer = b.fractional;
-// 	integer = fractional;
-
-// 	b.fractional.clear();
-// 	fractional.clear();
-
-	
-
-//    	std::cout << b << std::endl; 
-
-//     b.is_negative = false;
-//     BigNum result, current;
-//     current.is_negative = false;
-//     result.integer.resize(integer.size());
-
-//     long long size_this = (integer.size()) - 1;
-
-//     for (long long i = size_this; i >= 0; i--) {
-//             shift_right(current);
-            
-//             current.integer[0] = integer[i];
-//             delete_zeros(current);
-//             int x = 0, l = 0, r = base;
-//             while (l <= r) {
-//                 int m = (l + r) / 2;
-//                 BigNum t = b * BigNum(std::to_string(m));
-//                 if (t <= current) {
-//                     x = m;
-//                     l = m + 1;
-//                 }
-                
-//                 else {r = m - 1;}
-                
-//             }
- 
-//             result.integer[i] = x;
-//             current = current - b * BigNum(std::to_string(x));
-//         }
- 
-//     result.is_negative = is_negative != b.is_negative;
-//     delete_zeros(result);
-//     (*this) = result;
-//     return (*this);
-// }
-
-// BigNum BigNum::operator %(const BigNum& other) {
-//         BigNum result = (*this) - ((*this) / other) * other;
-//         // std::cout << ((*this)/other) << std::endl;
-//         if (result.is_negative) {result += other;}
-//         return result;
-// }
-
 // Арифметика
 
 BigNum BigNum::operator+(const BigNum& other){
@@ -787,4 +639,29 @@ BigNum BigNum::operator/(const BigNum& other){
 	BigNum p = (*this);
 	p/=other;
 	return p;
+}
+
+// Числа Пи
+BigNum Pi(long long precision_pi){
+	std::vector<BigNum> pow_sixteen;
+	BigNum one = "1.0";
+	BigNum sixteen = "0.0625";
+	BigNum ans = "0";
+	BigNum powI1, powI2, powI3, powI4, chisl, znam;
+	
+	pow_sixteen.push_back(one);
+	for (long long i = 1; i < precision_pi; i++){
+		pow_sixteen.push_back(pow_sixteen[i-1]*sixteen);
+	}
+	for (long long i = 0; i < precision_pi; i++){
+		powI1 = BigNum(i);
+		powI2 = powI1*BigNum(i);
+		powI3 = powI2*BigNum(i);
+		powI4 = powI3*BigNum(i);
+		chisl = "120"_bn*powI2 + "151"_bn*powI1 + "47"_bn;
+		znam = "512"_bn*powI4 + "1024"_bn*powI3 + "712"_bn*powI2 + "194"_bn*powI1 + "15"_bn;
+		ans+= pow_sixteen[i]*(chisl/znam);
+	}
+	ans.fractional.erase(ans.fractional.cbegin(), ans.fractional.cbegin() + ans.fractional.size()-precision_pi/3-1);
+	return ans;
 }
