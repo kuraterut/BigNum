@@ -41,21 +41,16 @@ RESET   = \033[0m
 # Files
 #-------
 
-INCLUDES = \
-	include/BigNum.hpp 		\
-	include/test_system.hpp
+INCLUDES = $(wildcard include/*.hpp)
 
 # Add "include" folder to header search path:
 CFLAGS += -I $(abspath include)
 
 # List of sources:
-SOURCES = \
-	BigNum.cpp 		 					\
-	test_system.cpp  					\
-	test.cpp
+SOURCES = $(wildcard src/*.cpp)
 
 
-OBJECTS = $(SOURCES:%.cpp=build/%.o)
+OBJECTS = $(SOURCES:src/%.cpp=build/%.o)
 
 EXECUTABLE = build/test
 
@@ -69,13 +64,13 @@ default: $(EXECUTABLE)
 
 # Link all object files together to obtain a binary:
 # NOTE: all object files will be built first.
-$(EXECUTABLE): $(OBJECTS)
+$(EXECUTABLE): $(OBJECTS) Makefile
 	@printf "$(BYELLOW)Linking executable $(BCYAN)$@$(RESET)\n"
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 # Compile an object file:
 # NOTE: all include files are passed as dependencies (this may be redundant)
-build/%.o: src/%.cpp $(INCLUDES)
+build/%.o: src/%.cpp $(INCLUDES) Makefile
 	@printf "$(BYELLOW)Building object file $(BCYAN)$@$(RESET)\n"
 	@mkdir -p build
 	$(CC) -c $< $(CFLAGS) -o $@
