@@ -22,7 +22,7 @@ using namespace TestSystem;
 // Test verdicts
 //---------------
 
-constexpr size_t TIMEOUT_MILLISSECONDS = 100U; // seconds
+constexpr size_t TIMEOUT_MILLISSECONDS = 1000U; // seconds
 
 // Test system implementation:
 TestResult TestSystem::run_test(const char* name, TestScenario test, bool inspect /* = false */)

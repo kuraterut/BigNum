@@ -59,7 +59,7 @@ struct BigNum
 	bool operator>=(const BigNum& other);
     
 
-	// Число pi 
+	
 
 
 };
@@ -76,6 +76,8 @@ std::string to_string(const BigNum& num);
 
 // Унарный минус
 BigNum operator-(const BigNum& other);
+
+// Число pi 
 BigNum Pi(long long precision_pi);
 
 

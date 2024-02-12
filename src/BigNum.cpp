@@ -650,7 +650,7 @@ BigNum BigNum::operator/(const BigNum& other){
 	return p;
 }
 
-// Числа Пи
+// Число Пи
 BigNum Pi(long long precision_pi){
 	std::vector<BigNum> pow_sixteen;
 	BigNum one = "1.0";
