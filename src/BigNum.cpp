@@ -49,6 +49,39 @@ BigNum BigNum::bignum_create(const char* strch){
 	return help;
 }
 
+BigNum& delete_zeros(BigNum& that){
+	long long size_int = that.integer.size();
+	long long size_fract = that.fractional.size();
+	auto iter_int = that.integer.cbegin();
+	auto iter_fract = that.fractional.cbegin();
+	
+	for (long long i = size_int-1; i >= 0; i--){
+		if(that.integer[i] == 0 && i != 0){
+			that.integer.erase(iter_int+i);
+			iter_int = that.integer.cbegin();
+		}
+		else{
+			break;
+		}
+	}
+	for (long long i = 0; i < size_fract; i++){
+		if(that.fractional[0] == 0 && i != size_fract - 1){
+			that.fractional.erase(iter_fract);
+			iter_fract = that.fractional.cbegin();
+		}
+		else{
+			break;
+		}
+	}
+	if ((that.fractional.size() == 0 || (that.fractional.size() == 1 && that.fractional[0] == 0)) && that.integer.size() == 1 && that.integer[0] == 0){
+		that.is_negative = false; 
+	}
+
+	return that;
+}
+
+
+
 BigNum::BigNum(const std::string strcon){
 	std::string str = strcon;
 	if(str[0] == '-'){
@@ -91,10 +124,14 @@ BigNum::BigNum(const std::string strcon){
 			else{fractional.push_back(std::stoll(str_fractional.substr(i-3, 3)));}
 		}		
 	}
+	delete_zeros(*this);
 }
 
 BigNum::BigNum(const char* str) : BigNum(std::string(str)){}
 BigNum::BigNum(const long long num) : BigNum(std::to_string(num)){}
+BigNum::BigNum(const long double num) : BigNum(std::to_string(num)) {}
+BigNum::BigNum(const double num) : BigNum(std::to_string(num)) {}
+BigNum::BigNum(const int num) : BigNum(std::to_string(num)) {}
 
 // Создание литерала с плавающей точкой
 
@@ -162,37 +199,6 @@ std::string to_string(const BigNum& num)
     }
 
     return os.str();
-}
-
-BigNum& delete_zeros(BigNum& that){
-	long long size_int = that.integer.size();
-	long long size_fract = that.fractional.size();
-	auto iter_int = that.integer.cbegin();
-	auto iter_fract = that.fractional.cbegin();
-	
-	for (long long i = size_int-1; i >= 0; i--){
-		if(that.integer[i] == 0 && i != 0){
-			that.integer.erase(iter_int+i);
-			iter_int = that.integer.cbegin();
-		}
-		else{
-			break;
-		}
-	}
-	for (long long i = 0; i < size_fract; i++){
-		if(that.fractional[i] == 0 && i != size_fract - 1){
-			that.fractional.erase(iter_fract);
-			iter_fract = that.fractional.cbegin();
-		}
-		else{
-			break;
-		}
-	}
-	if ((that.fractional.size() == 0 || (that.fractional.size() == 1 && that.fractional[0] == 0)) && that.integer.size() == 1 && that.integer[0] == 0){
-		that.is_negative = false; 
-	}
-
-	return that;
 }
 
 
@@ -513,7 +519,7 @@ bool is_zero(const BigNum& that){
 }
 
 BigNum& BigNum::operator/=(const BigNum& other){
-
+	if(BigNum(0) != other && BigNum(0.0) != other){
 	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
 	for (long long i = 0; i < 35; i++){
@@ -612,7 +618,10 @@ BigNum& BigNum::operator/=(const BigNum& other){
 		}
 	}
 	delete_zeros((*this));
+
 	return (*this);
+	}
+	throw "Division by zero";
 }
 
 // Арифметика

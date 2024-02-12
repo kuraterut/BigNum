@@ -15,11 +15,16 @@
 
 struct BigNum
 {
+	// Конструкторы
 	BigNum() = default;
 	BigNum(const char* str);
 	BigNum(const std::string strcon);
 	BigNum(const long long num);
+	BigNum(const long double num);
+	BigNum(const double num);
+	BigNum(const int num);
 
+ 	// Поля структуры (Длинное число)
 	static const long long BASE = base;
 	
 	bool is_negative;
@@ -36,6 +41,7 @@ struct BigNum
 	BigNum operator*(const BigNum& other);
 	BigNum operator/(const BigNum& other);
 	BigNum operator%(const BigNum& other);
+
 	// Присваивание
 	BigNum& operator=(const BigNum& other);
 	BigNum& operator=(const char* str);

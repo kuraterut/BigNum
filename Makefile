@@ -1,18 +1,3 @@
-# No copyright. Vladislav Alenik, 2024
-
-# How to use this Makefile:
-# 1. Place all you .cpp files into the src folder.
-#    List them in the SOURCES file.
-# 2. Place all you .hpp files into the include folder.
-#    List them in the INCLUDES file.
-# 3. Set EXECUTABLE variable to your program's name.
-# 4. Build your program with "make".
-# 5. Perform debug build with "make DEBUG=1" or "DEBUG=1 make".
-# 6. Run your program with "make run".
-# 7. Clean all build files with "make clean".
-#
-# ENJOY!
-
 #-----------------------
 # Compiler/linker flags
 #-----------------------
@@ -57,15 +42,18 @@ RESET   = \033[0m
 #-------
 
 INCLUDES = \
-	include/BigNum.hpp
+	include/BigNum.hpp 		\
+	include/test_system.hpp
 
 # Add "include" folder to header search path:
 CFLAGS += -I $(abspath include)
 
 # List of sources:
 SOURCES = \
-	BigNum.cpp \
+	BigNum.cpp 		 					\
+	test_system.cpp  					\
 	test.cpp
+
 
 OBJECTS = $(SOURCES:%.cpp=build/%.o)
 
