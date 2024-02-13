@@ -97,6 +97,7 @@ TestResult TestSystem::run_test(const char* name, TestScenario test, bool inspec
     if (ret == 0)
     {
         printf(BPURPLE "[TIMEOUT]\n" RESET);
+        kill(child_pid, SIGKILL);
         return TIMEOUT;
     }
 

@@ -65,8 +65,9 @@ struct BigNum
 };
 
 // Литерал с плавающей точкой
+BigNum operator ""_bn(const char* lit);
 BigNum operator ""_bn(const char* lit, size_t);
-BigNum operator ""_bn(long double num);
+// BigNum operator ""_bn(long double num);
 
 // Вывод числа
 // std::string operator<<(const BigNum& that);

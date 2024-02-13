@@ -37,6 +37,7 @@ bool test_cr_standard(){
 bool test_cr_literal(){
     try{
         BigNum a = "1234.678"_bn;
+        BigNum b = 125235.125135_bn;
     }
 
     catch (const std::exception& exc){

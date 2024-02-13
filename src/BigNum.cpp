@@ -135,19 +135,26 @@ BigNum::BigNum(const int num) : BigNum(std::to_string(num)) {}
 
 // Создание литерала с плавающей точкой
 
-BigNum operator ""_bn(const char* lit, size_t)
+BigNum operator ""_bn(const char* lit)
 {
     std::string str = lit;
     BigNum p = str;
     return p;
 }
 
-BigNum operator ""_bn(long double num)
+
+BigNum operator ""_bn(const char* lit, size_t)
 {
-    std::string str = std::__cxx11::to_string(num); 
+    std::string str = lit;
     BigNum p = str;
     return p;
 }
+// BigNum operator ""_bn(long double num)
+// {
+//     std::string str = std::__cxx11::to_string(num); 
+//     BigNum p = str;
+//     return p;
+// }
 
 // Вывод числа
 
