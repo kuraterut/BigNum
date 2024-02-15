@@ -10,39 +10,21 @@
 
 using namespace TestSystem;
 
-bool test_cr_empty(){
-    try{
-        BigNum a;
-    }
-
-    catch (const std::exception& exc){
-        return FAIL;
-    }
+bool test_cr_empty(){    
+    BigNum a;
 
     return OK;
 }
 
 bool test_cr_standard(){
-    try{
-        BigNum a = "16216.26264";
-    }
-
-    catch (const std::exception& exc){
-        return FAIL;
-    }
+    BigNum a = "16216.26264";
 
     return OK;
 }
 
 bool test_cr_literal(){
-    try{
-        BigNum a = "1234.678"_bn;
-        BigNum b = 125235.125135_bn;
-    }
-
-    catch (const std::exception& exc){
-        return FAIL;
-    }
+    BigNum a = "1234.678"_bn;
+    BigNum b = 125235.125135_bn;
 
     return OK;
 }
@@ -254,7 +236,7 @@ bool calculating_Pi(){
     clock_t start = clock();
     BigNum my_Pi = Pi(100);
     clock_t finish = clock();
-    std::cout << "Pi calculating Time: "<< (double)(finish-start)/CLOCKS_PER_SEC<< " sec" << std::endl;
+    std::cout << "\nPi calculating Time: "<< (double)(finish-start)/CLOCKS_PER_SEC<< " sec" << std::endl;
     std::cout << my_Pi << std::endl;
     BigNum rightPi = "3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982"_bn;
     return (my_Pi == rightPi)? OK : FAIL;

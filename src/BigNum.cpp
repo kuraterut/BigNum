@@ -527,6 +527,7 @@ bool is_zero(const BigNum& that){
 
 BigNum& BigNum::operator/=(const BigNum& other){
 	if(BigNum(0) != other && BigNum(0.0) != other){
+		
 	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
 	for (long long i = 0; i < 35; i++){
