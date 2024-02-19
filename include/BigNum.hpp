@@ -15,6 +15,16 @@
 
 struct BigNum
 {
+	// Поля структуры (Длинное число)
+	private:
+	static const long long BASE = base;
+
+	std::vector<long long> integer;
+	std::vector<long long> fractional;
+	
+
+	public:
+	bool is_negative;
 	// Конструкторы
 	BigNum() = default;
 	BigNum(const char* str);
@@ -24,17 +34,11 @@ struct BigNum
 	BigNum(const double num);
 	BigNum(const int num);
 
- 	// Поля структуры (Длинное число)
-	static const long long BASE = base;
-	
-	bool is_negative;
-	
-	std::vector<long long> integer;
-	std::vector<long long> fractional;
+ 	
 	
 	// Создание числа
 	BigNum bignum_create(const char* strch);
-	
+	BigNum& delete_zeros();
 	// Арифметика
 	BigNum operator+(const BigNum& other);
 	BigNum operator-(const BigNum& other);
@@ -58,9 +62,12 @@ struct BigNum
 	bool operator<=(const BigNum& other);
 	bool operator>=(const BigNum& other);
     
+    //Настройка точности
+    BigNum& set_precision(long long precision);
+    std::string to_string() const;
 
+		
 	
-
 
 };
 
@@ -73,7 +80,6 @@ BigNum operator ""_bn(const char* lit, size_t);
 // std::string operator<<(const BigNum& that);
 
 std::ostream& operator <<(std::ostream& os, const BigNum& num);
-std::string to_string(const BigNum& num);
 
 // Унарный минус
 BigNum operator-(const BigNum& other);

@@ -75,12 +75,28 @@ build/%.o: src/%.cpp $(INCLUDES) Makefile
 	@mkdir -p build
 	$(CC) -c $< $(CFLAGS) -o $@
 
+pi: build/Pi
+	./build/Pi
+
+build/Pi: build/Pi.o Makefile
+	@printf "$(BYELLOW)Linking executable $(BCYAN)$@$(RESET)\n"
+	$(CC) $(LDFLAGS) build/Pi.o build/BigNum.o -o $@
+
+build/Pi.o: src/Pi/Pi.cpp $(INCLUDES) Makefile
+	@printf "$(BYELLOW)Building object file $(BCYAN)$@$(RESET)\n"
+	@mkdir -p build
+	$(CC) -c $< $(CFLAGS) -o $@
+
+
+
+
+
 #--------------
 # Test scripts
 #--------------
 
 # Run program:
-run: $(EXECUTABLE)
+test: $(EXECUTABLE)
 	./$(EXECUTABLE)
 
 #---------------
@@ -92,4 +108,4 @@ clean:
 	rm -rf build
 
 # List of non-file targets:
-.PHONY: run clean default
+.PHONY: run clean default pi

@@ -85,8 +85,8 @@ bool test_division(){
     bool check1 = (a / b == BigNum(0.5));
     bool check2 = (c / a == BigNum(5.2));
     bool check3 = (c / b == BigNum(2.6));
-    // std::cout << a/b << std::endl;
-    bool check4 = (a / d == "0.333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"_bn);
+    a.set_precision(100);
+    bool check4 = (a / d == "0.333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333"_bn);
     return (check1 && check2 && check3 && check4)? OK : FAIL;
 }
 
@@ -155,9 +155,11 @@ bool test_division_assignment(){
     a/=b;
     c/=a;
     d/=a;
+    BigNum rval = BigNum(10.4);
     bool check1 = (a == BigNum(0.5));
     bool check2 = (c == BigNum(10.4));
-    bool check3 = (d == BigNum(6.0));
+    bool check3 = (d == BigNum(6));
+
     return (check1 && check2 && check3)? OK : FAIL;
 }
 
@@ -278,7 +280,7 @@ int main(void)
     run_test("testing operator less or equal than",                 test_less_or_equality       );
 
     //Calculating Pi
-    run_test("calculating Pi",                                      calculating_Pi              );
+    run_test("calculating Pi with precision 100",                   calculating_Pi              );
     
     return EXIT_SUCCESS;
 }

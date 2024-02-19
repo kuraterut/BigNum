@@ -49,35 +49,51 @@ BigNum BigNum::bignum_create(const char* strch){
 	return help;
 }
 
-BigNum& delete_zeros(BigNum& that){
-	long long size_int = that.integer.size();
-	long long size_fract = that.fractional.size();
-	auto iter_int = that.integer.cbegin();
-	auto iter_fract = that.fractional.cbegin();
+BigNum& BigNum::set_precision(long long num){
+	long long precision = num/3+1;
+	long long cur_precision = fractional.size();
+	if (precision > cur_precision){
+		for (long long i = 0; i < precision-cur_precision; i++){
+			(*this).fractional.emplace((*this).fractional.cbegin(), 0);
+		}
+	}
+	else{
+		for (long long i = 0; i < cur_precision-precision; i++){
+			fractional.erase(fractional.cbegin());
+		}
+	}
+	return *this;
+}
+
+BigNum& BigNum::delete_zeros(){
+	long long size_int = integer.size();
+	long long size_fract = fractional.size();
+	auto iter_int = integer.cbegin();
+	auto iter_fract = fractional.cbegin();
 	
 	for (long long i = size_int-1; i >= 0; i--){
-		if(that.integer[i] == 0 && i != 0){
-			that.integer.erase(iter_int+i);
-			iter_int = that.integer.cbegin();
+		if(integer[i] == 0 && i != 0){
+			integer.erase(iter_int+i);
+			iter_int = integer.cbegin();
 		}
 		else{
 			break;
 		}
 	}
 	for (long long i = 0; i < size_fract; i++){
-		if(that.fractional[0] == 0 && i != size_fract - 1){
-			that.fractional.erase(iter_fract);
-			iter_fract = that.fractional.cbegin();
+		if(fractional[0] == 0 && i != size_fract - 1){
+			fractional.erase(iter_fract);
+			iter_fract = fractional.cbegin();
 		}
 		else{
 			break;
 		}
 	}
-	if ((that.fractional.size() == 0 || (that.fractional.size() == 1 && that.fractional[0] == 0)) && that.integer.size() == 1 && that.integer[0] == 0){
-		that.is_negative = false; 
+	if ((fractional.size() == 0 || (fractional.size() == 1 && fractional[0] == 0)) && integer.size() == 1 && integer[0] == 0){
+		is_negative = false; 
 	}
 
-	return that;
+	return *this;
 }
 
 
@@ -124,7 +140,7 @@ BigNum::BigNum(const std::string strcon){
 			else{fractional.push_back(std::stoll(str_fractional.substr(i-3, 3)));}
 		}		
 	}
-	delete_zeros(*this);
+	(*this).delete_zeros();
 }
 
 BigNum::BigNum(const char* str) : BigNum(std::string(str)){}
@@ -160,31 +176,31 @@ BigNum operator ""_bn(const char* lit, size_t)
 
 std::ostream& operator <<(std::ostream& os, const BigNum& num)
 {
-    os << to_string(num);
+    os << num.to_string();
     return os;
 }
 
 
 // Вспомогательные функции
-std::string to_string(const BigNum& num)
+std::string BigNum::to_string() const
 {
     std::ostringstream os;
-    if (num.is_negative){os << "-";}
+    if (is_negative){os << "-";}
 
-    long long size_fract = num.fractional.size();
-    long long size_int = num.integer.size();
+    long long size_fract = fractional.size();
+    long long size_int = integer.size();
 
     for (long long i = size_int-1; i >= 0; i--){
-		if(i != size_int-1 && num.integer[i] < 10){
+		if(i != size_int-1 && integer[i] < 10){
 			os << "00";
-			os << std::to_string(num.integer[i]);	
+			os << std::to_string(integer[i]);	
 		}
-		else if(i != size_int-1 && num.integer[i] < 100){
+		else if(i != size_int-1 && integer[i] < 100){
 			os << "0";
-			os << std::to_string(num.integer[i]);
+			os << std::to_string(integer[i]);
 		}    	
 		else{
-    		os << std::to_string(num.integer[i]);	
+    		os << std::to_string(integer[i]);	
     	}
     }
     if(size_fract != 0){
@@ -192,16 +208,16 @@ std::string to_string(const BigNum& num)
     }
 
     for (long long i = size_fract-1; i >= 0; i--){
-    	if(num.fractional[i] < 10){
+    	if(fractional[i] < 10){
 			os << "00";
-			os << std::to_string(num.fractional[i]);	
+			os << std::to_string(fractional[i]);	
 		}
-		else if(num.fractional[i] < 100){
+		else if(fractional[i] < 100){
 			os << "0";
-			os << std::to_string(num.fractional[i]);
+			os << std::to_string(fractional[i]);
 		}    	
 		else{
-    		os << std::to_string(num.fractional[i]);	
+    		os << std::to_string(fractional[i]);	
     	}	
     }
 
@@ -212,7 +228,7 @@ std::string to_string(const BigNum& num)
 // Унарный минус
 BigNum operator-(const BigNum& other){
 	BigNum help = other;
-	help.is_negative = !help.is_negative;
+	help.is_negative = !other.is_negative;
 	return help;
 }
 
@@ -444,7 +460,7 @@ BigNum& BigNum::operator+=(const BigNum& other){
 		}
 
 	}
-	delete_zeros((*this));
+	(*this).delete_zeros();
 	return (*this);
 }
 
@@ -513,7 +529,7 @@ BigNum& BigNum::operator*=(const BigNum& other){
 		(*this).integer[i-ans_point] = ans[i];
 	}
 
-	delete_zeros((*this));
+	(*this).delete_zeros();
 
 	return (*this);
 }
@@ -530,9 +546,9 @@ BigNum& BigNum::operator/=(const BigNum& other){
 		
 	(*this).is_negative = (*this).is_negative != other.is_negative;
 	
-	for (long long i = 0; i < 35; i++){
-		(*this).fractional.emplace((*this).fractional.cbegin(), 0);
-	}
+	// for (long long i = 0; i < 35; i++){
+	// 	(*this).fractional.emplace((*this).fractional.cbegin(), 0);
+	// }
 
 	long long size_this = (*this).integer.size() + (*this).fractional.size();
 	long long size_other = other.integer.size() + other.fractional.size();
@@ -559,7 +575,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	for (long long i = 0; i < size_int_other; i++){
 		other_num.integer.push_back(other.integer[i]);
 	}
-	delete_zeros(other_num);
+	other_num.delete_zeros();
 
 	for (long long i = 0; i < size_other; i++){
 		this_num.emplace(this_num.cbegin(), 0);
@@ -571,7 +587,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 	for (long long i = 0; i < size_this + size_other; i++){
 		if (i < size_this){
 			help.integer.emplace(help.integer.cbegin(), this_num[size_this+size_other-i-1]);
-			delete_zeros(help);
+			help.delete_zeros();
 			ans.integer.emplace(ans.integer.cbegin(), 0);
 			if (help < other_num){continue;}
 			else{
@@ -589,7 +605,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 			else{
 				precision+=1;
 				help.integer.emplace(help.integer.cbegin(), this_num[size_this+size_other-i-1]);
-				delete_zeros(help);
+				help.delete_zeros();
 				ans.integer.emplace(ans.integer.cbegin(), 0);
 				if (help < other_num){continue;}
 				else{
@@ -625,7 +641,7 @@ BigNum& BigNum::operator/=(const BigNum& other){
 			(*this).integer.push_back(ans.integer[i]);
 		}
 	}
-	delete_zeros((*this));
+	(*this).delete_zeros();
 
 	return (*this);
 	}
@@ -677,8 +693,10 @@ BigNum Pi(long long precision_pi){
 		powI4 = powI3*BigNum(i);
 		chisl = "120"_bn*powI2 + "151"_bn*powI1 + "47"_bn;
 		znam = "512"_bn*powI4 + "1024"_bn*powI3 + "712"_bn*powI2 + "194"_bn*powI1 + "15"_bn;
+		chisl.set_precision(precision_pi);
 		ans+= pow_sixteen[i]*(chisl/znam);
 	}
-	ans.fractional.erase(ans.fractional.cbegin(), ans.fractional.cbegin() + ans.fractional.size()-precision_pi/3-1);
+	ans.set_precision(precision_pi);
+	// ans.fractional.erase(ans.fractional.cbegin(), ans.fractional.cbegin() + ans.fractional.size()-precision_pi/3-1);
 	return ans;
 }
